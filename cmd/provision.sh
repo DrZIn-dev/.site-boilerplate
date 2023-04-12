@@ -56,36 +56,39 @@ then
     
   sudo apt-get update -y
   sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-  # echo -e "\e[32m[ OK  ]\e[0m Finished Installing Docker"
   ok "Finished Installing Docker"
 else
-  # echo -e "\e[33m[ SKIPPED  ]\e[0m Docker is already installed"
   skipped "Docker is already installed"
 fi
 
-# Check docker swarm is initialized
-# echo "        Started Initializing Docker Swarm"
-info "Started Initializing Docker Swarm"
-if ! docker info | grep -q "Swarm: active"
-then
-  docker swarm init
-  # echo -e "\e[32m[ OK  ]\e[0m Finished Initializing Docker Swarm"
-  ok "Finished Initializing Docker Swarm"
-else
-  # echo -e "\e[33m[ SKIPPED  ]\e[0m Docker Swarm is already initialized"
-  skipped "Docker Swarm is already initialized"
-fi
 
 # Check docker-compose is installed
-# echo "        Started Installing Docker-Compose"
 info "Started Installing Docker-Compose"
 if ! command -v docker-compose &> /dev/null
 then
   sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   sudo chmod +x /usr/local/bin/docker-compose
-  # echo -e "\e[32m[ OK  ]\e[0m Finished Installing Docker-Compose"
   ok "Finished Installing Docker-Compose"
 else
-  # echo -e "\e[33m[ SKIPPED  ]\e[0m Docker-Compose is already installed"
   skipped "Docker-Compose is already installed"
+fi
+
+# Check docker swarm is initialized
+info "Started Initializing Docker Swarm"
+if ! docker info | grep -q "Swarm: active"
+then
+  docker swarm init
+  ok "Finished Initializing Docker Swarm"
+else
+  skipped "Docker Swarm is already initialized"
+fi
+
+# Check docker swarm task limit is not 3
+info "Started Updating Docker Swarm Task Limit"
+if ! docker info | grep -q "Task History Limit: 3"
+then
+  docker swarm update --task-history-limit 3
+  ok "Finished Updating Docker Swarm Task Limit"
+else
+  skipped "Docker Swarm Task Limit is already 3"
 fi
