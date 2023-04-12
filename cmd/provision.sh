@@ -39,6 +39,15 @@ fi
 # Change directory to script directory
 cd "$(dirname "$0")"
 
+# Check if ../.env file exists
+if [ ! -f ../.env ]
+then
+  failed "Please create a .env file in the root directory"
+  exit
+else
+  ok "Found .env file"
+fi
+
 # Check docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin is installed
 info "Started Installing Docker"
 if ! command -v docker &> /dev/null
