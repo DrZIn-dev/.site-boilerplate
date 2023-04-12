@@ -118,6 +118,6 @@ fi
 
 # Deploy mongo stack
 info "Started Deploying Mongo Stack"
-docker compose -f ./mongo.yaml --env-file ../.env pull
-docker stack deploy -c <(docker-compose -f ./mongo.yaml --env-file ../.env config) mongo
+docker compose -f ../docker/mongo.yaml --env-file ../.env pull
+docker stack deploy -c <(docker-compose -f ../docker/mongo.yaml --env-file ../.env config) mongo
 ok "Finished Deploying Mongo Stack"
