@@ -1,14 +1,4 @@
 #!bin/bash
-# echo with same pad start size with 16 spaces
-echo "                $1"
-# echo [ OK  ] with green color in ok text
-echo -e "\e[32m[ OK  ]\e[0m"
-# echo [ SKIPPED  ] with yellow color in skipped text
-echo -e "\e[33m[ SKIPPED  ]\e[0m"
-# echo [ FAILED  ] with red color in failed text
-echo -e "\e[31m[ FAILED  ]\e[0m"
-# echo "tab" with 8 spaces in info text
-echo "        "
 
 # Function to echo [ OK  ] with green color in ok text
 ok() {
@@ -39,9 +29,9 @@ fi
 # Change directory to script directory
 cd "$(dirname "$0")"
 
-# Check if ../.env file exists
+# Check if ./.env file exists
 info "Started Checking .env file"
-if [ ! -f ../.env ]
+if [ ! -f ./.env ]
 then
   failed "Please create a .env file in the root directory"
   exit
@@ -118,42 +108,42 @@ fi
 
 # Deploy mongo stack
 info "Started Deploying Mongo Stack"
-# Check permissions of ../docker/data/mongo_primary is 1001
-if [ "$(stat -c '%u' ../docker/data/mongo_primary)" -ne 1001 ]
+# Check permissions of ./docker/data/mongo_primary is 1001
+if [ "$(stat -c '%u' ./docker/data/mongo_primary)" -ne 1001 ]
 then
-  chown -R 1001 ../docker/data/mongo_primary
-  ok "Changed Permissions of ../docker/data/mongo_primary to 1001"
+  chown -R 1001 ./docker/data/mongo_primary
+  ok "Changed Permissions of ./docker/data/mongo_primary to 1001"
 else
-  skipped "Permissions of ../docker/data/mongo_primary is already 1001"
+  skipped "Permissions of ./docker/data/mongo_primary is already 1001"
 fi
-docker compose -f ../docker/mongo.yaml --env-file ../.env pull
-docker stack deploy -c <(docker-compose -f ../docker/mongo.yaml --env-file ../.env config) mongo
+docker compose -f ./docker/mongo.yaml --env-file ./.env pull
+docker stack deploy -c <(docker-compose -f ./docker/mongo.yaml --env-file ./.env config) mongo
 ok "Finished Deploying Mongo Stack"
 
 # Deploy ctl stack
 info "Started Deploying Ctl Stack"
-docker compose -f ../docker/ctl.yaml --env-file ../.env pull
-docker stack deploy -c <(docker-compose -f ../docker/ctl.yaml --env-file ../.env config) ctl
+docker compose -f ./docker/ctl.yaml --env-file ./.env pull
+docker stack deploy -c <(docker-compose -f ./docker/ctl.yaml --env-file ./.env config) ctl
 ok "Finished Deploying Ctl Stack"
 
 # Deploy gateway stack
 info "Started Deploying Gateway Stack"
-docker compose -f ../docker/gateway.yaml --env-file ../.env pull
-docker stack deploy -c <(docker-compose -f ../docker/gateway.yaml --env-file ../.env config) gateway
+docker compose -f ./docker/gateway.yaml --env-file ./.env pull
+docker stack deploy -c <(docker-compose -f ./docker/gateway.yaml --env-file ./.env config) gateway
 ok "Finished Deploying Gateway Stack"
 
 # Deploy site compose
 info "Started Deploying Site Stack"
-docker compose -p site -f ../docker/site.yaml pull
-docker compose -p site -f ../docker/site.yaml up -d
+docker compose -p site -f ./docker/site.yaml pull
+docker compose -p site -f ./docker/site.yaml up -d
 ok "Finished Deploying Site Stack"
 
 # Check if --with-private is passed
 if [ "$1" = "--with-private" ]
 then
-  # Check have site.crt site.key in ../certs
+  # Check have site.crt site.key in ./certs
   info "Started Checking Certs"
-  if [ ! -f ../certs/site.crt ] || [ ! -f ../certs/site.key ]
+  if [ ! -f ./certs/site.crt ] || [ ! -f ./certs/site.key ]
   then
     failed "Please create site.crt and site.key in the certs directory"
     exit
@@ -182,18 +172,18 @@ then
   fi
 
   info "Started Deploying Core Stack"
-  docker compose -f ../docker/core.yaml --env-file ../.env pull
-  docker stack deploy -c <(docker-compose -f ../docker/core.yaml --env-file ../.env config) core --with-registry-auth
+  docker compose -f ./docker/core.yaml --env-file ./.env pull
+  docker stack deploy -c <(docker-compose -f ./docker/core.yaml --env-file ./.env config) core --with-registry-auth
   ok "Finished Deploying Core Stack"
 
   info "Started Deploying Auth Stack"
-  docker compose -f ../docker/auth.yaml --env-file ../.env pull
-  docker stack deploy -c <(docker-compose -f ../docker/auth.yaml --env-file ../.env config) auth --with-registry-auth
+  docker compose -f ./docker/auth.yaml --env-file ./.env pull
+  docker stack deploy -c <(docker-compose -f ./docker/auth.yaml --env-file ./.env config) auth --with-registry-auth
   ok "Finished Deploying Auth Stack"
 
   info "Started Deploying EDC Stack"
-  docker compose -f ../docker/edc.yaml --env-file ../.env pull
-  docker stack deploy -c <(docker-compose -f ../docker/edc.yaml --env-file ../.env config) edc --with-registry-auth
+  docker compose -f ./docker/edc.yaml --env-file ./.env pull
+  docker stack deploy -c <(docker-compose -f ./docker/edc.yaml --env-file ./.env config) edc --with-registry-auth
   ok "Finished Deploying EDC Stack"
   
 else
