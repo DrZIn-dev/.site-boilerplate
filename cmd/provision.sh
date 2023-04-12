@@ -152,7 +152,8 @@ ok "Finished Deploying Site Stack"
 if [ "$1" = "--with-private" ]
 then
   # Check ghcr.io is logged in
-  if ! docker info | grep -q "Username: ghcr.io"
+  # Check logged in by docker login ghcr.io if result is not Login Succeeded then ask user to input email and personal access token
+  if ! docker login ghcr.io | grep -q "Login Succeeded"
   then
     # Ask user to input email
     read -p 'Email: ' email
