@@ -27,7 +27,7 @@ failed() {
 
 # Function to echo "tab" with 8 spaces
 info() {
-  echo "                           $1"
+  echo "             $1"
 }
 
 # Check if user is root
