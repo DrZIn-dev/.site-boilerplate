@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  api:
+    image: ghcr.io/veryeasycode/ez-ctl:${CTL_VERSION:-latest}
+    networks:
+      - site_ingress
+    ports:
+      - "30006:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../certs:/app/certs
+      - ./data/ez-ctl:/app/data
+    environment:
+      PORT: 80
+      DATABASE_URL: "file:../data/app.db"
+
+networks:
+  site_ingress:
+    name: site_ingress
+    external: true

@@ -1,0 +1,14 @@
+{
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
+            "file:///root/.site/docker/site.yaml",
+            "file:///root/.site/docker/ctl.yaml",
+            "file:///root/.site/docker/gateway.yaml",
+            "file:///root/.site/docker/mongo.yaml",
+            "file:///root/.site/docker/app.yaml",
+            "file:///root/.site/docker/auth.yaml",
+            "file:///root/.site/docker/core.yaml",
+            "file:///root/.site/docker/edc.yaml"
+        ]
+    }
+}

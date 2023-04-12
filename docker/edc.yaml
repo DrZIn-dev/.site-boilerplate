@@ -1,0 +1,44 @@
+version: "3.7"
+
+services:
+  api:
+    image: ghcr.io/veryeasycode/edc-api:${EDC_API_VERSION:-latest}
+    ports:
+      - 30004:80
+    networks:
+      - site_ingress
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+    environment:
+      PORT: 80
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_HOST: ${MONGODB_ADVERTISED_HOSTNAME}
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_AUTH_DB: admin
+      MONGO_REPLICA_SET: replicaset
+
+  ui:
+    image: ghcr.io/veryeasycode/edc-ui:${EDC_UI_VERSION:-latest}
+    ports:
+      - 30005:80
+    networks:
+      - site_ingress
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+
+networks:
+  site_ingress:
+    name: site_ingress
+    external: true

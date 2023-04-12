@@ -1,0 +1,61 @@
+version: "3.7"
+services:
+  api:
+    image: ghcr.io/veryeasycode/bizarre-authenticator:${AUTH_VERSION:-latest}
+    ports:
+      - 30003:80
+    networks:
+      - site_ingress
+    environment:
+      FLASK_ENV: production
+      PORT: 80
+      JWT_SECRET: ${JWT_SECRET}
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_AUTH_DB: admin
+      MONGO_HOST: ${MONGODB_ADVERTISED_HOSTNAME}
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_USER_COLLECTION: _users
+      MONGO_USER_ENCODING_COLLECTION: user_encoding
+      CONFIDENT_LEVEL: 0.6
+      REDIS_HOST: image_cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${AUTH_REDIS_PASSWORD}
+      REDIS_EXPIRATION_DAYS: 30
+    volumes:
+      - ../storage/image:/app/src/recognition/images
+  image_cache:
+    image: redis:6.2
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--requirepass",
+        "${AUTH_REDIS_PASSWORD}",
+      ]
+    volumes:
+      - image_cache_data:/data
+    networks:
+      - site_ingress
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+
+networks:
+  site_ingress:
+    name: site_ingress
+    external: true
+
+volumes:
+  image_cache_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /root/.site/docker/data/auth_image_cache

@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  primary:
+    image: "bitnami/mongodb:4.4.15"
+    ports:
+      - "27017:27017"
+    networks:
+      - site_ingress
+    environment:
+      MONGODB_ADVERTISED_HOSTNAME: ${MONGODB_ADVERTISED_HOSTNAME}
+      MONGODB_REPLICA_SET_MODE: primary
+      MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGODB_REPLICA_SET_KEY: ${MONGODB_REPLICA_SET_KEY}
+    volumes:
+      - "primary_data:/bitnami/mongodb"
+
+volumes:
+  primary_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /root/.site/docker/data/mongo_primary
+
+networks:
+  site_ingress:
+    name: site_ingress
+    external: true

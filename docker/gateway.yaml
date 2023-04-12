@@ -1,0 +1,23 @@
+version: "3.7"
+
+services:
+  nginx:
+    image: ghcr.io/veryeasycode/bizarre-infrastructure/nginx:${NGINX_VERSION:-latest}
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - site_ingress
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ../certs:/etc/nginx/certs
+      - ../storage:/storage
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supersecret}
+      ADMINS: "${ADMINS:-admin:test}"
+
+networks:
+  site_ingress:
+    name: site_ingress
+    external: true

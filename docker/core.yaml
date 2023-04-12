@@ -1,0 +1,105 @@
+version: "3.7"
+
+services:
+  bizarre_backoffice:
+    image: ghcr.io/veryeasycode/bizarre-backoffice:${CORE_BACKOFFICE_VERSION:-latest}
+    ports:
+      - 30000:80
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+
+  bizarre_functions:
+    image: ghcr.io/veryeasycode/bizarre-functions:${CORE_FUNCTION_VERSION:-latest}
+    ports:
+      - 30001:80
+    environment:
+      PORT: 80
+      BASE_URL: /api
+      NODE_ENV: production
+      LOG_ROTATE_INTERVAL: 2
+      LOG_DIRECTORY: ./log
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_HOST: ${MONGODB_ADVERTISED_HOSTNAME}
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_AUTH_DB: admin
+      MONGO_REPLICA_SET: replicaset
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${CORE_REDIS_PASSWORD}
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+    volumes:
+      - ../storage/image:/usr/bizarre-functions/upload
+      - ../storage/log:/usr/bizarre-functions/log
+
+  bizarre_trigger:
+    image: ghcr.io/veryeasycode/bizarre-trigger:${CORE_TRIGGER_VERSION:-latest}
+    environment:
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_HOST: ${MONGODB_ADVERTISED_HOSTNAME}
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_AUTH_DB: admin
+      MONGO_REPLICA_SET: replicaset
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${CORE_REDIS_PASSWORD}
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+
+  mongo_stream:
+    image: ghcr.io/veryeasycode/ez-mongo-stream:${CORE_STREAM_VERSION:-latest}
+    ports:
+      - 30002:80
+    environment:
+      PORT: 80
+      NODE_ENV: production
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_HOST: ${MONGODB_ADVERTISED_HOSTNAME}
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_AUTH_DB: admin
+      MONGO_REPLICA_SET: replicaset
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${CORE_REDIS_PASSWORD}
+
+  cache:
+    image: redis:6.2
+    command: redis-server --requirepass ${CORE_REDIS_PASSWORD}
+    volumes:
+      - cache_data:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+
+volumes:
+  cache_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /root/.site/docker/data/core_cache

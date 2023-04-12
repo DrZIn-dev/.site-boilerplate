@@ -1,0 +1,13 @@
+docker/data/ez-ctl/*
+docker/data/mongo_primary/*
+docker/data/auth_image_cache/*
+docker/data/core_cache/*
+docker/PAT
+storage/image/*
+storage/log/*
+certs/*
+redi
+
+!/**/.gitkeep
+
+.env
