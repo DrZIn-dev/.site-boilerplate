@@ -174,19 +174,22 @@ then
 
   info "Started Deploying Core Stack"
   docker compose -f ../docker/core.yaml --env-file ../.env pull
-  docker stack deploy -c <(docker-compose -f ../docker/core.yaml --env-file ../.env config) core
+  docker stack deploy -c <(docker-compose -f ../docker/core.yaml --env-file ../.env config) core --with-registry-auth
   ok "Finished Deploying Core Stack"
 
   info "Started Deploying Auth Stack"
   docker compose -f ../docker/auth.yaml --env-file ../.env pull
-  docker stack deploy -c <(docker-compose -f ../docker/auth.yaml --env-file ../.env config) auth
+  docker stack deploy -c <(docker-compose -f ../docker/auth.yaml --env-file ../.env config) auth --with-registry-auth
   ok "Finished Deploying Auth Stack"
 
   info "Started Deploying EDC Stack"
   docker compose -f ../docker/edc.yaml --env-file ../.env pull
-  docker stack deploy -c <(docker-compose -f ../docker/edc.yaml --env-file ../.env config) edc
+  docker stack deploy -c <(docker-compose -f ../docker/edc.yaml --env-file ../.env config) edc --with-registry-auth
   ok "Finished Deploying EDC Stack"
   
 else
   skipped "Deploy Private Images"
 fi
+
+
+# Print command output with same 3 lines
