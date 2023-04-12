@@ -25,6 +25,16 @@ else
   echo "[ SKIPPED  ] Docker is already installed"
 fi
 
+# Check docker swarm is initialized
+if ! docker info | grep -q "Swarm: active"
+then
+  echo "        Started Initializing Docker Swarm"
+  docker swarm init
+  echo "[ OK  ] Finished Initializing Docker Swarm"
+else
+  echo "[ SKIPPED  ] Docker Swarm is already initialized"
+fi
+
 # sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 # sudo chmod +x /usr/local/bin/docker-compose
 
