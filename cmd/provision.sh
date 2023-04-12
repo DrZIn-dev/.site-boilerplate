@@ -1,5 +1,6 @@
 #!bin/bash
-
+# echo with same pad start size with 16 spaces
+echo "                $1"
 # echo [ OK  ] with green color in ok text
 echo -e "\e[32m[ OK  ]\e[0m"
 # echo [ SKIPPED  ] with yellow color in skipped text
@@ -11,7 +12,7 @@ echo "        "
 
 # Function to echo [ OK  ] with green color in ok text
 ok() {
-  echo -e "\e[32m[ OK  ]\e[0m $1"
+  echo -e "\e[32m[ OK  ]\e[0m      $1"
 }
 
 # Function to echo [ SKIPPED  ] with yellow color in skipped text
@@ -21,12 +22,12 @@ skipped() {
 
 # Function to echo [ FAILED  ] with red color in failed text
 failed() {
-  echo -e "\e[31m[ FAILED  ]\e[0m $1"
+  echo -e "\e[31m[ FAILED  ]\e[0m  $1"
 }
 
 # Function to echo "tab" with 8 spaces
 info() {
-  echo "        $1"
+  echo "                           $1"
 }
 
 # Check if user is root
