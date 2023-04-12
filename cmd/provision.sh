@@ -118,6 +118,12 @@ fi
 
 # Deploy mongo stack
 info "Started Deploying Mongo Stack"
+# Check permissions of ../docker/data/mongo_primary is 1001
+if [ "$(stat -c '%u' ../docker/data/mongo_primary)" -ne 1001 ]
+then
+  chown -R 1001 ../docker/data/mongo_primary
+  ok "Changed Permissions of ../docker/data/mongo_primary to 1001"
+fi
 docker compose -f ../docker/mongo.yaml --env-file ../.env pull
 docker stack deploy -c <(docker-compose -f ../docker/mongo.yaml --env-file ../.env config) mongo
 ok "Finished Deploying Mongo Stack"
