@@ -129,3 +129,21 @@ fi
 docker compose -f ../docker/mongo.yaml --env-file ../.env pull
 docker stack deploy -c <(docker-compose -f ../docker/mongo.yaml --env-file ../.env config) mongo
 ok "Finished Deploying Mongo Stack"
+
+# Deploy ctl stack
+info "Started Deploying Ctl Stack"
+docker compose -f ../docker/ctl.yaml --env-file ../.env pull
+docker stack deploy -c <(docker-compose -f ../docker/ctl.yaml --env-file ../.env config) ctl
+ok "Finished Deploying Ctl Stack"
+
+# Deploy gateway stack
+info "Started Deploying Gateway Stack"
+docker compose -f ../docker/gateway.yaml --env-file ../.env pull
+docker stack deploy -c <(docker-compose -f ../docker/gateway.yaml --env-file ../.env config) gateway
+ok "Finished Deploying Gateway Stack"
+
+# Deploy site compose
+info "Started Deploying Site Stack"
+docker compose -p site -f ../docker/site.yaml pull
+docker compose -p site -f ../docker/site.yaml up -d
+ok "Finished Deploying Site Stack"
