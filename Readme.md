@@ -18,6 +18,8 @@ is a boilerplate for setup new site machine.
 
 3. Copy .env.example to .env
 
+   - must change `HOST_NAME`, `JWT_SECRET`
+
    ```shell
    cp .env.example .env
    ```
