@@ -40,6 +40,7 @@ fi
 cd "$(dirname "$0")"
 
 # Check if ../.env file exists
+info "Started Checking .env file"
 if [ ! -f ../.env ]
 then
   failed "Please create a .env file in the root directory"
