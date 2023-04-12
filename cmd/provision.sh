@@ -36,6 +36,9 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+# Change directory to script directory
+cd "$(dirname "$0")"
+
 # Check docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin is installed
 info "Started Installing Docker"
 if ! command -v docker &> /dev/null
@@ -92,3 +95,19 @@ then
 else
   skipped "Docker Swarm Task Limit is already 3"
 fi
+
+# Check docker network site_ingress is created
+info "Started Creating Docker Network site_ingress"
+if ! docker network ls | grep -q "site_ingress"
+then
+  docker network create --driver overlay --attachable site_ingress
+  ok "Finished Creating Docker Network site_ingress"
+else
+  skipped "Docker Network site_ingress is already created"
+fi
+
+# Deploy mongo stack
+info "Started Deploying Mongo Stack"
+docker compose -f ./mongo.yaml --env-file ../.env pull
+docker stack deploy -c <(docker-compose -f ./mongo.yaml --env-file ../.env config) mongo
+ok "Finished Deploying Mongo Stack"
