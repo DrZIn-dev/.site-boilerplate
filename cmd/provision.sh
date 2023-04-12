@@ -123,6 +123,8 @@ if [ "$(stat -c '%u' ../docker/data/mongo_primary)" -ne 1001 ]
 then
   chown -R 1001 ../docker/data/mongo_primary
   ok "Changed Permissions of ../docker/data/mongo_primary to 1001"
+else
+  skipped "Permissions of ../docker/data/mongo_primary is already 1001"
 fi
 docker compose -f ../docker/mongo.yaml --env-file ../.env pull
 docker stack deploy -c <(docker-compose -f ../docker/mongo.yaml --env-file ../.env config) mongo
