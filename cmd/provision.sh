@@ -151,18 +151,41 @@ ok "Finished Deploying Site Stack"
 # Check if --with-private is passed
 if [ "$1" = "--with-private" ]
 then
-  read -p 'Email: ' email
-  # Ask user to input personal access token
-  # Receive input from user and store it in variable
-  read -p 'Pull Secret: ' pull_secret
-  # Check if pull_secret is empty
-  if [ -z "$pull_secret" ]
+  # Check ghcr.io is logged in
+  if ! docker info | grep -q "Username: ghcr.io"
   then
-    failed "Pull Secret is empty"
-    exit
+    # Ask user to input email
+    read -p 'Email: ' email
+    # Ask user to input personal access token
+    # Receive input from user and store it in variable
+    read -p 'Pull Secret: ' pull_secret
+    # Check if pull_secret is empty
+    if [ -z "$pull_secret" ]
+    then
+      failed "Pull Secret is empty"
+      exit
+    fi
+    # Login ghcr.io with pull_secret
+    docker login ghcr.io -u "$email" -p "$pull_secret"
+  else
+    skipped "ghcr.io is already logged in"
   fi
-  # Login ghcr.io with pull_secret
-  docker login ghcr.io -u "$email" -p "$pull_secret"
+
+  info "Started Deploying App Stack"
+  docker compose -f ../docker/app.yaml --env-file ../.env pull
+  docker stack deploy -c <(docker-compose -f ../docker/app.yaml --env-file ../.env config) app
+  ok "Finished Deploying App Stack"
+
+  info "Started Deploying Auth Stack"
+  docker compose -f ../docker/auth.yaml --env-file ../.env pull
+  docker stack deploy -c <(docker-compose -f ../docker/auth.yaml --env-file ../.env config) auth
+  ok "Finished Deploying Auth Stack"
+
+  info "Started Deploying EDC Stack"
+  docker compose -f ../docker/edc.yaml --env-file ../.env pull
+  docker stack deploy -c <(docker-compose -f ../docker/edc.yaml --env-file ../.env config) edc
+  ok "Finished Deploying EDC Stack"
+  
 else
   skipped "Deploy Private Images"
 fi
