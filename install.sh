@@ -19,6 +19,12 @@ failed() {
 info() {
   echo "             $1"
 }
+# Check run script with bash only
+if [ "$BASH_VERSION" = "" ]
+then
+  failed "Please run with bash"
+  exit
+fi
 
 # Check if user is root
 if [ "$EUID" -ne 0 ]
