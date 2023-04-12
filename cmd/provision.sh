@@ -172,10 +172,10 @@ then
     skipped "ghcr.io is already logged in"
   fi
 
-  info "Started Deploying App Stack"
-  docker compose -f ../docker/app.yaml --env-file ../.env pull
-  docker stack deploy -c <(docker-compose -f ../docker/app.yaml --env-file ../.env config) app
-  ok "Finished Deploying App Stack"
+  info "Started Deploying Core Stack"
+  docker compose -f ../docker/core.yaml --env-file ../.env pull
+  docker stack deploy -c <(docker-compose -f ../docker/core.yaml --env-file ../.env config) core
+  ok "Finished Deploying Core Stack"
 
   info "Started Deploying Auth Stack"
   docker compose -f ../docker/auth.yaml --env-file ../.env pull
