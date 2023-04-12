@@ -16,30 +16,22 @@ is a boilerplate for setup new site machine.
    git clone https://github.com/DrZIn-dev/.site-boilerplate.git .site
    ```
 
-3. Copy .env.example to .env
-
-   - must change `HOST_NAME`, `JWT_SECRET`
-
-   ```shell
-   cp .env.example .env
-   ```
-
-4. Change directory to .site
+3. Change directory to .site
 
    ```shell
    cd .site
    ```
 
-5. Run provision.sh
+4. Copy .env.example to .env
 
-   - install docker
-   - install docker-compose
+   > Must edit .env file before run provision.sh
 
    ```shell
-   bash provision.sh
+   cp .env.example .env
    ```
 
-6. Setup public container
+5. Run install.sh
+
    ```shell
-   bash setup-public.sh
+   bash /root/.site/install.sh
    ```

@@ -1,3 +1,4 @@
+version: '3.7'
 services:
   avahi:
     image: ghcr.io/veryeasycode/bizarre-infrastructure/avahi:${AVAHI_VERSION:-latest}
