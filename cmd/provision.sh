@@ -85,7 +85,7 @@ fi
 
 # Check docker swarm task limit is not 3
 info "Started Updating Docker Swarm Task Limit"
-if ! docker info | grep -q "Task History Limit: 3"
+if ! docker info | grep -q "   Task History Retention Limit: 3"
 then
   docker swarm update --task-history-limit 3
   ok "Finished Updating Docker Swarm Task Limit"
