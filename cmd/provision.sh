@@ -151,6 +151,15 @@ ok "Finished Deploying Site Stack"
 # Check if --with-private is passed
 if [ "$1" = "--with-private" ]
 then
+  # Check have site.crt site.key in ../certs
+  info "Started Checking Certs"
+  if [ ! -f ../certs/site.crt ] || [ ! -f ../certs/site.key ]
+  then
+    failed "Please create site.crt and site.key in the certs directory"
+    exit
+  else
+    ok "Found site.crt and site.key in the certs directory"
+  fi
   # Check ghcr.io is logged in
   # Check logged in by docker login ghcr.io if result is not Login Succeeded then ask user to input email and personal access token
   if ! docker login ghcr.io | grep -q "Login Succeeded"
