@@ -2,34 +2,38 @@
 
 # Function to echo [ OK  ] with green color in ok text
 ok() {
-  echo -e "\e[32m[ OK  ]\e[0m      $1"
+  echo -e "\e[32m[OK]\e[0m      $1"
 }
 
 # Function to echo [ SKIPPED  ] with yellow color in skipped text
 skipped() {
-  echo -e "\e[33m[ SKIPPED  ]\e[0m $1"
+  echo -e "\e[33m[SKIPPED]\e[0m $1"
 }
 
 # Function to echo [ FAILED  ] with red color in failed text
 failed() {
-  echo -e "\e[31m[ FAILED  ]\e[0m  $1"
+  echo -e "\e[31m[FAILED]\e[0m  $1"
 }
 
 # Function to echo "tab" with 8 spaces
 info() {
-  echo "             $1"
+  echo "          $1"
 }
 # Check run script with bash only
 if [ "$BASH_VERSION" = "" ]
 then
   failed "Please run with bash"
   exit
+else
+  ok "Running with bash"
 fi
 
 # Check if user is root
 if [ "$EUID" -ne 0 ]
   then failed "Please run as root"
   exit
+else
+  ok "Running as root"
 fi
 
 # Change directory to script directory
