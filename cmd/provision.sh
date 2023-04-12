@@ -147,3 +147,22 @@ info "Started Deploying Site Stack"
 docker compose -p site -f ../docker/site.yaml pull
 docker compose -p site -f ../docker/site.yaml up -d
 ok "Finished Deploying Site Stack"
+
+# Check if --with-private is passed
+if [ "$1" = "--with-private" ]
+then
+  read -p 'Email: ' email
+  # Ask user to input personal access token
+  # Receive input from user and store it in variable
+  read -p 'Pull Secret: ' pull_secret
+  # Check if pull_secret is empty
+  if [ -z "$pull_secret" ]
+  then
+    failed "Pull Secret is empty"
+    exit
+  fi
+  # Login ghcr.io with pull_secret
+  docker login ghcr.io -u "$email" -p "$pull_secret"
+else
+  skipped "Deploy Private Images"
+fi
