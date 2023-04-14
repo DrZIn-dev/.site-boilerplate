@@ -117,4 +117,4 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /root/.site/docker/data/core_cache
+      device: ./data/core_cache

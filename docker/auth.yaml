@@ -58,4 +58,4 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /root/.site/docker/data/auth_image_cache
+      device: ./data/auth_image_cache

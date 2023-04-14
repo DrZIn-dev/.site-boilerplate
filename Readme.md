@@ -33,13 +33,13 @@ is a boilerplate for setup new site machine.
 5. Run install.sh
 
    ```shell
-   bash /root/.site/install.sh
+   bash ./install.sh
    ```
 
 6. (Optional) Full install with private repo
 
    ```shell
-   bash /root/.site/install.sh --with-private
+   bash ./install.sh --with-private
    ```
 
    If ghcr.io is not login, you must input email and personal access token.

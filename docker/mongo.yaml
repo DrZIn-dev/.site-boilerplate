@@ -21,7 +21,7 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /root/.site/docker/data/mongo_primary
+      device: ./data/mongo_primary
 
 networks:
   site_ingress:
