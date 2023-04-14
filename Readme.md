@@ -35,3 +35,9 @@ is a boilerplate for setup new site machine.
    ```shell
    bash /root/.site/install.sh
    ```
+
+   full install with private repo
+
+   ```shell
+   bash /root/.site/install.sh --with-private
+   ```
