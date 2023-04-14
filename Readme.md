@@ -36,8 +36,15 @@ is a boilerplate for setup new site machine.
    bash /root/.site/install.sh
    ```
 
-   full install with private repo
+6. (Optional) Full install with private repo
 
    ```shell
    bash /root/.site/install.sh --with-private
+   ```
+
+   If ghcr.io is not login, you must input email and personal access token.
+
+   ```shell
+   Email: <your email>
+   Pull Secret: <your personal access token>
    ```
