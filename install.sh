@@ -69,11 +69,19 @@ then
     
   sudo apt-get update -y
   sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
   ok "Finished Installing Docker"
 else
   skipped "Docker is already installed"
 fi
-
+# Check docker is enabled in systemctl
+if ! systemctl is-enabled docker | grep -q "enabled"
+then
+  sudo systemctl enable docker
+  ok "Enabled Docker in systemctl"
+else
+  skipped "Docker is already enabled in systemctl"
+fi
 
 # Check docker-compose is installed
 info "Started Installing Docker-Compose"
@@ -84,26 +92,6 @@ then
   ok "Finished Installing Docker-Compose"
 else
   skipped "Docker-Compose is already installed"
-fi
-
-# Check docker swarm is initialized
-info "Started Initializing Docker Swarm"
-if ! docker info | grep -q "Swarm: active"
-then
-  docker swarm init
-  ok "Finished Initializing Docker Swarm"
-else
-  skipped "Docker Swarm is already initialized"
-fi
-
-# Check docker swarm task limit is not 3
-info "Started Updating Docker Swarm Task Limit"
-if ! docker info | grep -q "   Task History Retention Limit: 3"
-then
-  docker swarm update --task-history-limit 3
-  ok "Finished Updating Docker Swarm Task Limit"
-else
-  skipped "Docker Swarm Task Limit is already 3"
 fi
 
 # Check docker network site_ingress is created
@@ -127,19 +115,19 @@ else
   skipped "Permissions of ./docker/data/mongo_primary is already 1001"
 fi
 docker compose -f ./docker/mongo.yaml --env-file ./.env pull
-docker compose -f ./docker/mongo.yaml --env-file ./.env mongo
+docker compose -p mongo -f ./docker/mongo.yaml --env-file ./.env up -d
 ok "Finished Deploying Mongo Stack"
 
 # Deploy ctl stack
 info "Started Deploying Ctl Stack"
 docker compose -f ./docker/ctl.yaml --env-file ./.env pull
-docker compose -f ./docker/ctl.yaml --env-file ./.env ctl
+docker compose -p ctl -f ./docker/ctl.yaml --env-file ./.env up -d
 ok "Finished Deploying Ctl Stack"
 
 # Deploy gateway stack
 info "Started Deploying Gateway Stack"
 docker compose -f ./docker/gateway.yaml --env-file ./.env pull
-docker compose -f ./docker/gateway.yaml --env-file ./.env gateway
+docker compose -p gateway -f ./docker/gateway.yaml --env-file ./.env up -d
 ok "Finished Deploying Gateway Stack"
 
 # Deploy site compose
@@ -183,17 +171,17 @@ then
 
   info "Started Deploying Core Stack"
   docker compose -f ./docker/core.yaml --env-file ./.env pull
-  docker compose -f ./docker/core.yaml --env-file ./.env core
+  docker compose -p core -f ./docker/core.yaml --env-file ./.env up -d
   ok "Finished Deploying Core Stack"
 
   info "Started Deploying Auth Stack"
   docker compose -f ./docker/auth.yaml --env-file ./.env pull
-  docker compose -f ./docker/auth.yaml --env-file ./.env auth
+  docker compose -p auth -f ./docker/auth.yaml --env-file ./.env up -d
   ok "Finished Deploying Auth Stack"
 
   info "Started Deploying EDC Stack"
   docker compose -f ./docker/edc.yaml --env-file ./.env pull
-  docker compose -f ./docker/edc.yaml --env-file ./.env edc
+  docker compose -p edc -f ./docker/edc.yaml --env-file ./.env up -d
   ok "Finished Deploying EDC Stack"
   
 else
