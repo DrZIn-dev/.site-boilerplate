@@ -3,6 +3,7 @@ version: "3.7"
 services:
   primary:
     image: "bitnami/mongodb:4.4.15"
+    restart: always
     ports:
       - "27017:27017"
     networks:
@@ -13,15 +14,7 @@ services:
       MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
       MONGODB_REPLICA_SET_KEY: ${MONGODB_REPLICA_SET_KEY}
     volumes:
-      - "primary_data:/bitnami/mongodb"
-
-volumes:
-  primary_data:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: ./data/mongo_primary
+      - "./data/mongo_primary:/bitnami/mongodb"
 
 networks:
   site_ingress:
