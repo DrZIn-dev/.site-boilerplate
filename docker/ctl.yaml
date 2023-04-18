@@ -3,6 +3,7 @@ version: "3.7"
 services:
   api:
     image: ghcr.io/veryeasycode/ez-ctl:${CTL_VERSION:-latest}
+    restart: always
     networks:
       - site_ingress
     ports:

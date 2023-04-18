@@ -3,17 +3,11 @@ version: "3.7"
 services:
   api:
     image: ghcr.io/veryeasycode/edc-api:${EDC_API_VERSION:-latest}
+    restart: always
     ports:
       - 30004:80
     networks:
       - site_ingress
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      restart_policy:
-        condition: any
     environment:
       PORT: 80
       MONGO_USERNAME: root
@@ -26,17 +20,11 @@ services:
 
   ui:
     image: ghcr.io/veryeasycode/edc-ui:${EDC_UI_VERSION:-latest}
+    restart: always
     ports:
       - 30005:80
     networks:
       - site_ingress
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      restart_policy:
-        condition: any
 
 networks:
   site_ingress:

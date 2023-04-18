@@ -127,19 +127,19 @@ else
   skipped "Permissions of ./docker/data/mongo_primary is already 1001"
 fi
 docker compose -f ./docker/mongo.yaml --env-file ./.env pull
-docker stack deploy -c <(docker-compose -f ./docker/mongo.yaml --env-file ./.env config) mongo
+docker compose -f ./docker/mongo.yaml --env-file ./.env mongo
 ok "Finished Deploying Mongo Stack"
 
 # Deploy ctl stack
 info "Started Deploying Ctl Stack"
 docker compose -f ./docker/ctl.yaml --env-file ./.env pull
-docker stack deploy -c <(docker-compose -f ./docker/ctl.yaml --env-file ./.env config) ctl
+docker compose -f ./docker/ctl.yaml --env-file ./.env ctl
 ok "Finished Deploying Ctl Stack"
 
 # Deploy gateway stack
 info "Started Deploying Gateway Stack"
 docker compose -f ./docker/gateway.yaml --env-file ./.env pull
-docker stack deploy -c <(docker-compose -f ./docker/gateway.yaml --env-file ./.env config) gateway
+docker compose -f ./docker/gateway.yaml --env-file ./.env gateway
 ok "Finished Deploying Gateway Stack"
 
 # Deploy site compose
@@ -183,17 +183,17 @@ then
 
   info "Started Deploying Core Stack"
   docker compose -f ./docker/core.yaml --env-file ./.env pull
-  docker stack deploy -c <(docker-compose -f ./docker/core.yaml --env-file ./.env config) core --with-registry-auth
+  docker compose -f ./docker/core.yaml --env-file ./.env core
   ok "Finished Deploying Core Stack"
 
   info "Started Deploying Auth Stack"
   docker compose -f ./docker/auth.yaml --env-file ./.env pull
-  docker stack deploy -c <(docker-compose -f ./docker/auth.yaml --env-file ./.env config) auth --with-registry-auth
+  docker compose -f ./docker/auth.yaml --env-file ./.env auth
   ok "Finished Deploying Auth Stack"
 
   info "Started Deploying EDC Stack"
   docker compose -f ./docker/edc.yaml --env-file ./.env pull
-  docker stack deploy -c <(docker-compose -f ./docker/edc.yaml --env-file ./.env config) edc --with-registry-auth
+  docker compose -f ./docker/edc.yaml --env-file ./.env edc
   ok "Finished Deploying EDC Stack"
   
 else

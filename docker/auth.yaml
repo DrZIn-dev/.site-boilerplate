@@ -2,6 +2,7 @@ version: "3.7"
 services:
   api:
     image: ghcr.io/veryeasycode/bizarre-authenticator:${AUTH_VERSION:-latest}
+    restart: always
     ports:
       - 30003:80
     networks:
@@ -27,6 +28,7 @@ services:
       - ../storage/image:/app/src/recognition/images
   image_cache:
     image: redis:6.2
+    restart: always
     command:
       [
         "redis-server",
@@ -36,26 +38,11 @@ services:
         "${AUTH_REDIS_PASSWORD}",
       ]
     volumes:
-      - image_cache_data:/data
+      - ./data/auth_image_cache:/data
     networks:
       - site_ingress
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      restart_policy:
-        condition: any
 
 networks:
   site_ingress:
     name: site_ingress
     external: true
-
-volumes:
-  image_cache_data:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: ./data/auth_image_cache
