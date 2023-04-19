@@ -118,8 +118,8 @@ docker-compose --project-directory $(pwd)/docker/site --file $(pwd)/docker/site/
 docker-compose --project-directory $(pwd)/docker/site --file $(pwd)/docker/site/docker-compose.yaml up -d
 ok "Finished Create Site Compose"
 
-# Check if --with-private is passed
-if [ "$1" = "--with-private" ]
+# Check if --with-app is passed
+if [ "$1" = "--with-app" ]
 then
   info "Started Checking Certs"
   if [ ! -f $(pwd)/certs/site.crt ] || [ ! -f $(pwd)/certs/site.key ]
