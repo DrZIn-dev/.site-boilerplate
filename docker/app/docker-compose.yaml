@@ -1,0 +1,163 @@
+version: "3.7"
+
+services:
+  auth_api:
+    image: ghcr.io/veryeasycode/bizarre-authenticator:${AUTH_VERSION:-latest}
+    restart: always
+    ports:
+      - 30003:80
+    networks:
+      - site_ingress
+    environment:
+      FLASK_ENV: production
+      PORT: 80
+      JWT_SECRET: ${JWT_SECRET}
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_AUTH_DB: admin
+      MONGO_HOST: primary
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_USER_COLLECTION: _users
+      MONGO_USER_ENCODING_COLLECTION: user_encoding
+      CONFIDENT_LEVEL: 0.6
+      REDIS_HOST: image_cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${AUTH_REDIS_PASSWORD}
+      REDIS_EXPIRATION_DAYS: 30
+    volumes:
+      - ../../storage/image:/app/src/recognition/images
+  image_cache:
+    image: redis:6.2
+    restart: always
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--requirepass",
+        "${AUTH_REDIS_PASSWORD}"
+      ]
+    volumes:
+      - ./data/auth_image_cache:/data
+    networks:
+      - site_ingress
+  backoffice:
+    image: ghcr.io/veryeasycode/bizarre-backoffice:${CORE_BACKOFFICE_VERSION:-latest}
+    restart: always
+    ports:
+      - 30000:80
+    networks:
+      - site_ingress
+  functions:
+    image: ghcr.io/veryeasycode/bizarre-functions:${CORE_FUNCTION_VERSION:-latest}
+    restart: always
+    ports:
+      - 30001:80
+    networks:
+      - site_ingress
+    environment:
+      PORT: 80
+      BASE_URL: /api
+      NODE_ENV: production
+      LOG_ROTATE_INTERVAL: 2
+      LOG_DIRECTORY: ./log
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_HOST: primary
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_AUTH_DB: admin
+      MONGO_REPLICA_SET: replicaset
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${CORE_REDIS_PASSWORD}
+    volumes:
+      - ../../storage/image:/usr/bizarre-functions/upload
+      - ../../storage/log:/usr/bizarre-functions/log
+  trigger:
+    image: ghcr.io/veryeasycode/bizarre-trigger:${CORE_TRIGGER_VERSION:-latest}
+    restart: always
+    networks:
+      - site_ingress
+    environment:
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_HOST: primary
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_AUTH_DB: admin
+      MONGO_REPLICA_SET: replicaset
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${CORE_REDIS_PASSWORD}
+  stream:
+    image: ghcr.io/veryeasycode/ez-mongo-stream:${CORE_STREAM_VERSION:-latest}
+    restart: always
+    ports:
+      - 30002:80
+    networks:
+      - site_ingress
+    environment:
+      PORT: 80
+      NODE_ENV: production
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_HOST: primary
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_AUTH_DB: admin
+      MONGO_REPLICA_SET: replicaset
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${CORE_REDIS_PASSWORD}
+  cache:
+    image: redis:6.2
+    restart: always
+    command: redis-server --requirepass ${CORE_REDIS_PASSWORD}
+    networks:
+      - site_ingress
+    volumes:
+      - ./data/core_cache:/data
+  edc_api:
+    image: ghcr.io/veryeasycode/edc-api:${EDC_API_VERSION:-latest}
+    restart: always
+    ports:
+      - 30004:80
+    networks:
+      - site_ingress
+    environment:
+      PORT: 80
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_HOST: primary
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGODB_DB}
+      MONGO_AUTH_DB: admin
+      MONGO_REPLICA_SET: replicaset
+  edc_ui:
+    image: ghcr.io/veryeasycode/edc-ui:${EDC_UI_VERSION:-latest}
+    restart: always
+    ports:
+      - 30005:80
+    networks:
+      - site_ingress
+  mongo_primary:
+    image: "bitnami/mongodb:4.4.15"
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - site_ingress
+    environment:
+      MONGODB_ADVERTISED_HOSTNAME: primary
+      MONGODB_REPLICA_SET_MODE: primary
+      MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGODB_REPLICA_SET_KEY: ${MONGODB_REPLICA_SET_KEY}
+    volumes:
+      - "./data/mongo_primary:/bitnami/mongodb"
+
+networks:
+  site_ingress:
+    name: site_ingress
+    external: true

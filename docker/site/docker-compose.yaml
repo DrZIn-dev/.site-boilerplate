@@ -1,0 +1,45 @@
+version: '3.7'
+services:
+  avahi:
+    image: ghcr.io/veryeasycode/bizarre-infrastructure/avahi:${AVAHI_VERSION:-latest}
+    restart: always
+    environment:
+      REFLECTOR_ENABLE_REFLECTOR: "yes"
+      SERVER_HOST_NAME: "${HOST_NAME:-local}" # Change this line following site name
+      SERVER_ALLOW_INTERFACES: "" # Change this line if site use other interface
+    network_mode: "host"
+  nginx:
+    image: ghcr.io/veryeasycode/bizarre-infrastructure/nginx:${NGINX_VERSION:-latest}
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - site_ingress
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ../../certs:/etc/nginx/certs
+      - ../../storage:/storage
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supersecret}
+      ADMINS: "${ADMINS:-admin:test}"
+  ctl_api:
+    image: ghcr.io/veryeasycode/ez-ctl:${CTL_VERSION:-latest}
+    restart: always
+    networks:
+      - site_ingress
+    ports:
+      - "30006:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../../certs:/app/certs
+      - ./data/ctl:/app/data
+    environment:
+      PORT: 80
+      DATABASE_URL: "file:../data/app.db"
+
+networks:
+  site_ingress:
+    name: site_ingress
+    external: true

@@ -118,23 +118,26 @@ docker compose -f ./docker/mongo.yaml --env-file ./.env pull
 docker compose -p mongo -f ./docker/mongo.yaml --env-file ./.env up -d
 ok "Finished Deploying Mongo Stack"
 
-# Deploy ctl stack
-info "Started Deploying Ctl Stack"
-docker compose -f ./docker/ctl.yaml --env-file ./.env pull
-docker compose -p ctl -f ./docker/ctl.yaml --env-file ./.env up -d
-ok "Finished Deploying Ctl Stack"
+info "Started Deploying Site Containers"
+docker compose -f ./docker/site/docker-compose.yaml --env-file ./.env pull
 
-# Deploy gateway stack
-info "Started Deploying Gateway Stack"
-docker compose -f ./docker/gateway.yaml --env-file ./.env pull
-docker compose -p gateway -f ./docker/gateway.yaml --env-file ./.env up -d
-ok "Finished Deploying Gateway Stack"
+# # Deploy ctl stack
+# info "Started Deploying Ctl Stack"
+# docker compose -f ./docker/ctl.yaml --env-file ./.env pull
+# docker compose -p ctl -f ./docker/ctl.yaml --env-file ./.env up -d
+# ok "Finished Deploying Ctl Stack"
 
-# Deploy site compose
-info "Started Deploying Site Stack"
-docker compose -p site -f ./docker/site.yaml pull
-docker compose -p site -f ./docker/site.yaml up -d
-ok "Finished Deploying Site Stack"
+# # Deploy gateway stack
+# info "Started Deploying Gateway Stack"
+# docker compose -f ./docker/gateway.yaml --env-file ./.env pull
+# docker compose -p gateway -f ./docker/gateway.yaml --env-file ./.env up -d
+# ok "Finished Deploying Gateway Stack"
+
+# # Deploy site compose
+# info "Started Deploying Site Stack"
+# docker compose -p site -f ./docker/site.yaml pull
+# docker compose -p site -f ./docker/site.yaml up -d
+# ok "Finished Deploying Site Stack"
 
 # Check if --with-private is passed
 if [ "$1" = "--with-private" ]

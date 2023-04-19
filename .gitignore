@@ -1,8 +1,9 @@
-docker/data/ez-ctl/*
-docker/data/mongo_primary/*
-docker/data/auth_image_cache/*
-docker/data/core_cache/*
-docker/PAT
+docker/app/data/auth_image_cache/*
+docker/app/data/core_cache/*
+docker/app/data/mongo_primary/*
+docker/site/data/ctl/*
+
+
 storage/image/*
 storage/log/*
 certs/*
