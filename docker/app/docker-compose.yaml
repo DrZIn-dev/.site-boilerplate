@@ -2,6 +2,7 @@ version: "3.7"
 
 services:
   auth_api:
+    container_name: app-auth_api
     image: ghcr.io/veryeasycode/bizarre-authenticator:${AUTH_VERSION:-latest}
     restart: always
     ports:
@@ -15,7 +16,7 @@ services:
       MONGO_USERNAME: root
       MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
       MONGO_AUTH_DB: admin
-      MONGO_HOST: primary
+      MONGO_HOST: mongo_primary
       MONGO_PORT: 27017
       MONGO_DB: ${MONGODB_DB}
       MONGO_USER_COLLECTION: _users
@@ -28,6 +29,7 @@ services:
     volumes:
       - ../../storage/image:/app/src/recognition/images
   image_cache:
+    container_name: app-image_cache
     image: redis:6.2
     restart: always
     command:
@@ -43,6 +45,7 @@ services:
     networks:
       - site_ingress
   backoffice:
+    container_name: app-backoffice
     image: ghcr.io/veryeasycode/bizarre-backoffice:${CORE_BACKOFFICE_VERSION:-latest}
     restart: always
     ports:
@@ -50,6 +53,7 @@ services:
     networks:
       - site_ingress
   functions:
+    container_name: app-functions
     image: ghcr.io/veryeasycode/bizarre-functions:${CORE_FUNCTION_VERSION:-latest}
     restart: always
     ports:
@@ -64,7 +68,7 @@ services:
       LOG_DIRECTORY: ./log
       MONGO_USERNAME: root
       MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
-      MONGO_HOST: primary
+      MONGO_HOST: mongo_primary
       MONGO_PORT: 27017
       MONGO_DB: ${MONGODB_DB}
       MONGO_AUTH_DB: admin
@@ -76,6 +80,7 @@ services:
       - ../../storage/image:/usr/bizarre-functions/upload
       - ../../storage/log:/usr/bizarre-functions/log
   trigger:
+    container_name: app-trigger
     image: ghcr.io/veryeasycode/bizarre-trigger:${CORE_TRIGGER_VERSION:-latest}
     restart: always
     networks:
@@ -83,7 +88,7 @@ services:
     environment:
       MONGO_USERNAME: root
       MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
-      MONGO_HOST: primary
+      MONGO_HOST: mongo_primary
       MONGO_PORT: 27017
       MONGO_DB: ${MONGODB_DB}
       MONGO_AUTH_DB: admin
@@ -92,6 +97,7 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${CORE_REDIS_PASSWORD}
   stream:
+    container_name: app-stream
     image: ghcr.io/veryeasycode/ez-mongo-stream:${CORE_STREAM_VERSION:-latest}
     restart: always
     ports:
@@ -103,7 +109,7 @@ services:
       NODE_ENV: production
       MONGO_USERNAME: root
       MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
-      MONGO_HOST: primary
+      MONGO_HOST: mongo_primary
       MONGO_PORT: 27017
       MONGO_DB: ${MONGODB_DB}
       MONGO_AUTH_DB: admin
@@ -112,6 +118,7 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${CORE_REDIS_PASSWORD}
   cache:
+    container_name: app-cache
     image: redis:6.2
     restart: always
     command: redis-server --requirepass ${CORE_REDIS_PASSWORD}
@@ -120,6 +127,7 @@ services:
     volumes:
       - ./data/core_cache:/data
   edc_api:
+    container_name: app-edc_api
     image: ghcr.io/veryeasycode/edc-api:${EDC_API_VERSION:-latest}
     restart: always
     ports:
@@ -130,12 +138,13 @@ services:
       PORT: 80
       MONGO_USERNAME: root
       MONGO_PASSWORD: ${MONGODB_ROOT_PASSWORD}
-      MONGO_HOST: primary
+      MONGO_HOST: mongo_primary
       MONGO_PORT: 27017
       MONGO_DB: ${MONGODB_DB}
       MONGO_AUTH_DB: admin
       MONGO_REPLICA_SET: replicaset
   edc_ui:
+    container_name: app-edc_ui
     image: ghcr.io/veryeasycode/edc-ui:${EDC_UI_VERSION:-latest}
     restart: always
     ports:
@@ -143,6 +152,7 @@ services:
     networks:
       - site_ingress
   mongo_primary:
+    container_name: app-mongo_primary
     image: "bitnami/mongodb:4.4.15"
     restart: always
     ports:
@@ -150,7 +160,7 @@ services:
     networks:
       - site_ingress
     environment:
-      MONGODB_ADVERTISED_HOSTNAME: primary
+      MONGODB_ADVERTISED_HOSTNAME: mongo_primary
       MONGODB_REPLICA_SET_MODE: primary
       MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
       MONGODB_REPLICA_SET_KEY: ${MONGODB_REPLICA_SET_KEY}

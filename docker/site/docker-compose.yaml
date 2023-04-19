@@ -1,14 +1,17 @@
 version: '3.7'
 services:
   avahi:
+    container_name: site-avahi
     image: ghcr.io/veryeasycode/bizarre-infrastructure/avahi:${AVAHI_VERSION:-latest}
     restart: always
     environment:
       REFLECTOR_ENABLE_REFLECTOR: "yes"
       SERVER_HOST_NAME: "${HOST_NAME:-local}" # Change this line following site name
-      SERVER_ALLOW_INTERFACES: "" # Change this line if site use other interface
+      SERVER_ALLOW_INTERFACES: "lo,eth0,en0" # Change this line if site use other interface
+      SERVER_DENY_INTERFACES: ""
     network_mode: "host"
   nginx:
+    container_name: site-nginx
     image: ghcr.io/veryeasycode/bizarre-infrastructure/nginx:${NGINX_VERSION:-latest}
     restart: always
     ports:
@@ -25,6 +28,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-supersecret}
       ADMINS: "${ADMINS:-admin:test}"
   ctl_api:
+    container_name: site-ctl_api
     image: ghcr.io/veryeasycode/ez-ctl:${CTL_VERSION:-latest}
     restart: always
     networks:

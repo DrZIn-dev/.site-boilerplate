@@ -39,9 +39,8 @@ fi
 # Change directory to script directory
 cd "$(dirname "$0")"
 
-# Check if ./.env file exists
 info "Started Checking .env file"
-if [ ! -f ./.env ]
+if [ ! -f $(pwd)/.env ]
 then
   failed "Please create a .env file in the root directory"
   exit
@@ -98,53 +97,32 @@ fi
 info "Started Creating Docker Network site_ingress"
 if ! docker network ls | grep -q "site_ingress"
 then
-  docker network create --driver overlay --attachable site_ingress
+  docker network create --attachable site_ingress
   ok "Finished Creating Docker Network site_ingress"
 else
   skipped "Docker Network site_ingress is already created"
 fi
 
-# Deploy mongo stack
-info "Started Deploying Mongo Stack"
-# Check permissions of ./docker/data/mongo_primary is 1001
-if [ "$(stat -c '%u' ./docker/data/mongo_primary)" -ne 1001 ]
+info "Started Checking permission $(pwd)/docker/app/data/mongo_primary is 1001"
+if [ "$(stat -c '%u' $(pwd)/docker/app/data/mongo_primary)" -ne 1001 ]
 then
-  chown -R 1001 ./docker/data/mongo_primary
-  ok "Changed Permissions of ./docker/data/mongo_primary to 1001"
+  chown -R 1001 $(pwd)/docker/app/data/mongo_primary
+  ok "Changed Permissions of $(pwd)/docker/app/data/mongo_primary to 1001"
 else
-  skipped "Permissions of ./docker/data/mongo_primary is already 1001"
+  skipped "Permissions of $(pwd)/docker/app/data/mongo_primary is already 1001"
 fi
-docker compose -f ./docker/mongo.yaml --env-file ./.env pull
-docker compose -p mongo -f ./docker/mongo.yaml --env-file ./.env up -d
-ok "Finished Deploying Mongo Stack"
 
-info "Started Deploying Site Containers"
-docker compose -f ./docker/site/docker-compose.yaml --env-file ./.env pull
-
-# # Deploy ctl stack
-# info "Started Deploying Ctl Stack"
-# docker compose -f ./docker/ctl.yaml --env-file ./.env pull
-# docker compose -p ctl -f ./docker/ctl.yaml --env-file ./.env up -d
-# ok "Finished Deploying Ctl Stack"
-
-# # Deploy gateway stack
-# info "Started Deploying Gateway Stack"
-# docker compose -f ./docker/gateway.yaml --env-file ./.env pull
-# docker compose -p gateway -f ./docker/gateway.yaml --env-file ./.env up -d
-# ok "Finished Deploying Gateway Stack"
-
-# # Deploy site compose
-# info "Started Deploying Site Stack"
-# docker compose -p site -f ./docker/site.yaml pull
-# docker compose -p site -f ./docker/site.yaml up -d
-# ok "Finished Deploying Site Stack"
+# Deploy ctl stack
+info "Started Create Site Compose"
+docker-compose --project-directory $(pwd)/docker/site --file $(pwd)/docker/site/docker-compose.yaml pull
+docker-compose --project-directory $(pwd)/docker/site --file $(pwd)/docker/site/docker-compose.yaml up -d
+ok "Finished Create Site Compose"
 
 # Check if --with-private is passed
 if [ "$1" = "--with-private" ]
 then
-  # Check have site.crt site.key in ./certs
   info "Started Checking Certs"
-  if [ ! -f ./certs/site.crt ] || [ ! -f ./certs/site.key ]
+  if [ ! -f $(pwd)/certs/site.crt ] || [ ! -f $(pwd)/certs/site.key ]
   then
     failed "Please create site.crt and site.key in the certs directory"
     exit
@@ -172,20 +150,10 @@ then
     skipped "ghcr.io is already logged in"
   fi
 
-  info "Started Deploying Core Stack"
-  docker compose -f ./docker/core.yaml --env-file ./.env pull
-  docker compose -p core -f ./docker/core.yaml --env-file ./.env up -d
-  ok "Finished Deploying Core Stack"
-
-  info "Started Deploying Auth Stack"
-  docker compose -f ./docker/auth.yaml --env-file ./.env pull
-  docker compose -p auth -f ./docker/auth.yaml --env-file ./.env up -d
-  ok "Finished Deploying Auth Stack"
-
-  info "Started Deploying EDC Stack"
-  docker compose -f ./docker/edc.yaml --env-file ./.env pull
-  docker compose -p edc -f ./docker/edc.yaml --env-file ./.env up -d
-  ok "Finished Deploying EDC Stack"
+  info "Started Deploying App Compose"
+  docker-compose --project-directory $(pwd)/docker/app --file $(pwd)/docker/app/docker-compose.yaml pull
+  docker-compose --project-directory $(pwd)/docker/app --file $(pwd)/docker/app/docker-compose.yaml up -d
+  ok "Finished Deploying App Compose"
   
 else
   skipped "Deploy Private Images"
